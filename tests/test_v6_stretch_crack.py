@@ -37,6 +37,7 @@ class V6Tests(unittest.TestCase):
     def source(self):
         return {'status':'PASS_PRELIMINARY','findings':{'errors':[]},'checks':{
             'bounding_boxes':{'static_comparison':{'status':'PASS'},'dynamic_comparison':{'status':'PASS'}},
+            'source_height':{'status':'PASS','selection_confirmed':True},
             'source_proportions':{'status':'PASS'},'accessories':{'status':'PASS_PRELIMINARY'},
             'joint_deformation':{'status':'PASS_PRELIMINARY'},
             'mesh_integrity':{'status':'PASS_PRELIMINARY'},'rig_stretch':{'status':'PASS_PRELIMINARY'},

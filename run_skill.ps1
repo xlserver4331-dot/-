@@ -11,6 +11,7 @@ param(
     [switch]$GameTest,
     [switch]$Execute,
     [switch]$AllowPendingPreview,
+    [switch]$NoHeightPrompt,
     [string]$Audit = ""
 )
 $ErrorActionPreference = "Stop"
@@ -24,6 +25,7 @@ if ($Compile) { $argsList += "--compile" }
 if ($Launch) { $argsList += "--launch" }
 if ($GameTest) { $argsList += "--game-test" }
 if ($Execute) { $argsList += "--execute" }
+if ($NoHeightPrompt) { $argsList += "--no-height-prompt" }
 if ($AllowPendingPreview) { $argsList += "--allow-pending-preview" }
 if ($Audit) { $argsList += @("--audit", $Audit) }
 & python @argsList

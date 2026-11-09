@@ -50,6 +50,11 @@ elif script.endswith('blender_audit.py'):
                       'source_proportions':{'status':'PASS'}, 'animation_suite':{'status':'PENDING_RUNTIME'},
                       'accessories':{'status':'PASS_PRELIMINARY'},'joint_deformation':{'status':'PASS_PRELIMINARY'},
                       'rig_stretch':{'status':'PASS_PRELIMINARY'},'mesh_integrity':{'status':'PASS_PRELIMINARY'}}}
+    if '--height-profile' in arguments:
+        hp=json.loads(pathlib.Path(v('--height-profile')).read_text())
+        result['checks']['source_height']={'status':'PASS','selection_confirmed':True,
+            'height_choice_mode':hp['height_choice']['mode'],
+            'target_body_height':hp['agent_reference_body_height']}
     pathlib.Path(v('--out')).write_text(json.dumps(result),encoding='utf8')
 else: sys.exit(3)
 '''
@@ -95,6 +100,11 @@ class IntegrationSimulated(unittest.TestCase):
         self.profile.write_text('{}')
         self.bbox = base / 'bbox.json'
         self.bbox.write_text('{}')
+        self.height_profile = base / 'height_profile.local.json'
+        self.height_profile.write_text(json.dumps({'model_type': 'humanoid',
+            'exclude_accessories_from_height': True,
+            'agent_reference_body_height': 100,
+            'height_choice': {'mode': 'match_agent', 'confirmed_by_user': True}}))
         self.settings = base / 'config.json'
         self.cfg = {
             'target':'prop_preview','cs2_root':str(self.root), 'addon_name':'my_addon',
@@ -152,6 +162,7 @@ class IntegrationSimulated(unittest.TestCase):
             "steps": [{"id": "idle", "action": "idle", "seconds": 0.5}]
         }), encoding="utf-8")
         self.cfg["target"] = "player_runtime"
+        self.cfg["height_profile"] = str(self.height_profile)
         for opt in ("proportion_profile", "original_proportions", "animation_suite", "accessories", "joint_deformation", "mesh_integrity", "rig_stretch"):
             self.cfg[opt] = str(self.profile)
         self.cfg["game_test_config"] = str(game_cfg)
@@ -164,6 +175,7 @@ class IntegrationSimulated(unittest.TestCase):
 
     def test_v7_firstperson_extraction_is_distinct_staged_operation(self):
         self.cfg['target']='player_runtime'
+        self.cfg['height_profile']=str(self.height_profile)
         for opt in ('proportion_profile','original_proportions','animation_suite','accessories','joint_deformation','mesh_integrity','rig_stretch'):
             self.cfg[opt]=str(self.profile)
         self.cfg['firstperson_extraction']=str(self.profile)

@@ -178,6 +178,16 @@ def gate_source_report(report, target, allow_pending_preview=False):
         if status == "FAIL":
             problems.append(f"{name} 检测 FAIL，禁止部署")
     if target == "player_runtime":
+        height_result = report.get("checks", {}).get("source_height", {})
+        if height_result.get("selection_confirmed") is not True:
+            problems.append("尚未在尺寸检测之前确认主体高度/缩放策略")
+        height_status = height_result.get("status", "PENDING")
+        if height_status not in ("PASS", "WARN"):
+            problems.append(f"主体身高或装饰物排除检查未通过: {height_status}")
+        elif height_status == "WARN":
+            # '尽量接近' is a soft threshold; continue, but retain explicit warning.
+            if not height_result.get("relative_deviation", 1) < height_result.get("failure_threshold", 0):
+                problems.append("主体高度偏差存在无法确认的配置，禁止自动部署")
         prop = report.get("checks", {}).get("source_proportions", {}).get("status", "PENDING")
         if prop != "PASS":
             problems.append(f"原始四肢比例与动态抗拉伸验证未通过: {prop}")

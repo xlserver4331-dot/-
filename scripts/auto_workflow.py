@@ -14,6 +14,9 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from height_policy_core import validate_height_choice
+from height_choice import configure_profile
+
 from auto_workflow_core import (
     addon_dirs, deploy_transaction, gate_source_report, prepare_file_plan,
     read_json, resolve_config_path, safe_relative, sha256, validate_map,
@@ -45,6 +48,14 @@ def doctor(config_file, cfg):
     model = path_of(config_file, cfg, "blend_file")
     root = path_of(config_file, cfg, "cs2_root")
     checks["blender_executable"] = bool(blender and blender.is_file())
+    height = path_of(config_file, cfg, "height_profile")
+    checks["height_profile"] = bool(height and height.is_file())
+    checks["height_choice_confirmed"] = False
+    if checks["height_profile"]:
+        try:
+            checks["height_choice_confirmed"] = validate_height_choice(read_json(height))[0] is None
+        except (ValueError, TypeError, OSError):
+            pass
     checks["blend_file"] = bool(model and model.is_file())
     source_fp = path_of(config_file, cfg, "firstperson_source_blend_file")
     checks["firstperson_source_blend_file"] = bool(source_fp and source_fp.is_file())
@@ -73,6 +84,52 @@ def doctor(config_file, cfg):
     game_config = path_of(config_file, cfg, "game_test_config")
     checks["game_test_config"] = bool(game_config and game_config.is_file())
     return checks
+
+
+
+def ensure_height_choice_before_audit(config_file, cfg, *, allow_interactive=True):
+    """Mandatory user choice BEFORE Blender measures height or anything gets modified.
+
+    Interactive terminal: ask and persist an explicit choice to *.local.json.
+    Headless/CI: fail closed with instructions instead of silently assuming agent size.
+    """
+    if cfg.get("target") != "player_runtime":
+        return {"status": "NOT_REQUIRED_PROP_PREVIEW"}
+    profile_file = path_of(config_file, cfg, "height_profile")
+    if not profile_file or not profile_file.is_file():
+        raise ValueError("NEEDS_HEIGHT_CHOICE: 请先复制 height_profile.humanoid/nonhumanoid.example.json 为 *.local.json")
+    profile = read_json(profile_file)
+    error, target, mode = validate_height_choice(profile)
+    if error and error.startswith('NEEDS_HEIGHT_CHOICE') and allow_interactive and sys.stdin.isatty():
+        print('开始尺寸检测前，必须由你选择：默认探员等高 / 自定义目标高度 / 全身等比例缩放 / 保持原高。', flush=True)
+        configure_profile(profile_file, interactive=True, save=True)
+        profile = read_json(profile_file)
+        error, target, mode = validate_height_choice(profile)
+    if error:
+        raise ValueError('NEEDS_HEIGHT_CHOICE: ' + error +
+            '。请先在交互终端运行 python scripts/height_choice.py --profile "' + str(profile_file) +
+            '" --save；自动化模式需明确 --mode ... --confirm --save。')
+    return {"status": "USER_CONFIRMED", "model_type": profile['model_type'],
+            "mode": mode, "target_body_height": target,
+            "note": "只做尺寸审计和统一缩放建议；不自动修改人物、四肢或装饰物。"}
+
+
+def verify_height_report_matches_decision(report, decision):
+    """Reject a previous height audit if the user has since changed the plan."""
+    if decision.get('status') == 'NOT_REQUIRED_PROP_PREVIEW':
+        return
+    measured = report.get('checks', {}).get('source_height', {})
+    if measured.get('selection_confirmed') is not True:
+        raise ValueError('源模型尺寸审计没有已确认的高度选择；不能复用旧报告')
+    if measured.get('height_choice_mode') != decision.get('mode'):
+        raise ValueError('高度策略已变更，请重新运行 Blender 主体高度审计')
+    try:
+        expected = float(decision['target_body_height'])
+        audited = float(measured['target_body_height'])
+    except (KeyError, ValueError, TypeError):
+        raise ValueError('尺寸报告缺少目标高度的原始证据')
+    if abs(audited / expected - 1.0) > 1e-6:
+        raise ValueError('目标高度已变更；旧模型审计结果不能用于部署')
 
 
 def run_process(command, *, cwd=None, log_path=None, expected=(0,)):
@@ -110,6 +167,12 @@ def do_audit(config_file, cfg, blend, folder, suffix=""):
             optional.extend([flag, path])
         elif cfg["target"] == "player_runtime":
             raise ValueError(f"玩家模型必须配置并提供 {name}；不得按默认探员拉伸")
+    if not cfg.get("_skip_height_check"):
+        height_file = path_of(config_file, cfg, "height_profile")
+        if height_file and height_file.is_file():
+            optional.extend(["--height-profile", height_file])
+        elif cfg["target"] == "player_runtime":
+            raise ValueError("玩家世界模型缺少 height_profile；不得将装饰物计入身高")
     for name, flag in (("accessories", "--accessories"), ("joint_deformation", "--joint-deformation"),
                        ("mesh_integrity", "--mesh-integrity"), ("rig_stretch", "--rig-stretch")):
         path = path_of(config_file, cfg, name)
@@ -324,6 +387,7 @@ def parser():
     ap.add_argument("--game-test", action="store_true", help="run 时在本机私人服务器中启动客户端、操作游戏并采样截图/日志（需单独授权和 GUI 依赖）")
     ap.add_argument("--allow-pending-preview", action="store_true", help="仅道具预览可显式放宽缺少参考 AABB；不能用于玩家模型")
     ap.add_argument("--audit", help="单独 deploy/compile/launch 的已有 Blender 审计 JSON（非默认从网络/机器猜测）")
+    ap.add_argument("--no-height-prompt", action="store_true", help="无交互模式：缺少用户缩放选择时直接阻止检测，而不是读取键盘输入")
     ap.add_argument("--out-dir", help="可选报告目录；默认自动生成独立时间戳目录")
     return ap
 
@@ -342,10 +406,15 @@ def main():
         if args.action == "doctor":
             meta["status"] = "DOCTOR_COMPLETE"
         else:
+            # P0 decision gate happens BEFORE first Blender audit, accessory setup,
+            # geometry edits, or any deploy/compile/launch commands.
+            height_decision = ensure_height_choice_before_audit(
+                cfg_file, cfg, allow_interactive=not args.no_height_prompt)
+            meta["steps"]["height_choice_before_size_audit"] = height_decision
             if args.action == "run":
                 required = ["blender_executable", "blend_file", "ag2_profile", "bbox_rules"]
                 if cfg["target"] == "player_runtime":
-                    required.extend(["proportion_profile", "original_proportions", "animation_suite", "accessories", "joint_deformation"])
+                    required.extend(["proportion_profile", "original_proportions", "animation_suite", "accessories", "joint_deformation", "height_profile"])
                 for item in required:
                     if not health[item]:
                         raise ValueError(f"预检失败: {item}")
@@ -357,7 +426,8 @@ def main():
                     meta["steps"]["accessory_setup"] = {"status":accessory_setup["status"], "file":accessory_setup.get("output_blend"),
                                                           "manual_weights_pending":accessory_setup.get("manual_weights_pending",[])}
                 first, report = do_audit(cfg_file, cfg, blend_file, report_dir, "_before")
-                meta["steps"]["audit_before"] = {"status": report.get("status"), "file": str(first)}
+                meta["steps"]["audit_before"] = {"status": report.get("status"), "file": str(first),
+                    "source_height": report.get("checks", {}).get("source_height", {}).get("status", "PENDING")}
                 if args.extract_viewmodel:
                     if cfg["target"] != "player_runtime":
                         raise ValueError("--extract-viewmodel 只适用于 player_runtime")
@@ -378,6 +448,7 @@ def main():
                                  "proportion_profile": "viewmodel_proportion_profile",
                                  "original_proportions": "viewmodel_original_proportions"}
                         vcfg = dict(cfg)
+                        vcfg["_skip_height_check"] = True  # FPS 裁剪手臂不按完整身高比较
                         for real_name, view_name in names.items():
                             if not cfg.get(view_name):
                                 raise ValueError(f"单独检测第一人称手模缺少 {view_name}")
@@ -454,6 +525,11 @@ def main():
                     raise ValueError("独立 deploy/compile/launch 必须提供 --audit 指向真实本地 Blender 审计报告")
                 report = read_json(Path(args.audit).expanduser())
                 meta["steps"]["audit_supplied"] = args.audit
+            # Protect against stale reports when the user changes target height
+            # after the last Blender measurement.
+            if cfg["target"] == "player_runtime" and (args.action in {"deploy", "compile", "launch"} or
+                (args.action == "run" and (args.deploy or args.compile or args.launch or args.game_test))):
+                verify_height_report_matches_decision(report, height_decision)
             if cfg["target"] == "player_runtime" and (args.action in {"deploy", "compile", "launch"} or
                 (args.action == "run" and (args.deploy or args.compile or args.launch or args.game_test))):
                 if args.action != "run":

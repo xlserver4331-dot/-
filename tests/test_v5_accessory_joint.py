@@ -73,6 +73,7 @@ class V5Tests(unittest.TestCase):
 
     def test_gate_blocks_missing_joint_or_accessory(self):
         report={'status':'PASS_PRELIMINARY','checks':{
+            'source_height':{'status':'PASS','selection_confirmed':True},
             'source_proportions':{'status':'PASS'},'reference_rest_pose':'USER_ATTESTED',
             'animation_suite':{'status':'PENDING_RUNTIME'},
             'bounding_boxes':{'static_comparison':{'status':'PASS'},'dynamic_comparison':{'status':'PASS'}},

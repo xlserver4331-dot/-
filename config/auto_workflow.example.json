@@ -56,5 +56,6 @@
   "workflow_guidance": "v7: 先全身源模型修复/比例审计，再 --extract-viewmodel 单独生成副本，手工重定向 FP 骨架与动作，然后分别审计世界模型/手模，核对模型部署清单。",
   "firstperson_extraction": "viewmodel_extraction.local.json",
   "dual_viewmodel": "dual_viewmodel.local.json",
-  "firstperson_source_blend_file": "D:/my_models/fullbody_extraction_source.blend"
+  "firstperson_source_blend_file": "D:/my_models/fullbody_extraction_source.blend",
+  "height_profile": "height_profile.humanoid.local.json"
 }

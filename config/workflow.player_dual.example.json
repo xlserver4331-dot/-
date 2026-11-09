@@ -58,5 +58,6 @@
   "server_port": 27015,
   "game_test_config": "game_test.local.json",
   "notes": "全部为模板路径，不能直接运行。独立第一人称手模已人工绑定到 viewmodel rig 后才填写 viewmodel_blend_file；FBX 单独导出，ModelDoc 共享 bodygroup 或 separate_vmdl 任选其一。",
-  "firstperson_source_blend_file": "D:/models/fullbody_extraction_source.blend"
+  "firstperson_source_blend_file": "D:/models/fullbody_extraction_source.blend",
+  "height_profile": "height_profile.humanoid.local.json"
 }

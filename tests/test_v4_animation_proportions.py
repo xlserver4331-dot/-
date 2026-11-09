@@ -84,6 +84,7 @@ class V4Tests(unittest.TestCase):
     def test_source_gate_blocks_modified_lengths(self):
         report = {"status": "PASS_PRELIMINARY", "checks": {
             "bounding_boxes": {"static_comparison": {"status": "PASS"}, "dynamic_comparison": {"status": "PASS"}},
+            "source_height": {"status": "PASS", "selection_confirmed": True},
             "reference_rest_pose": "USER_ATTESTED", "source_proportions": {"status": "FAIL"},
             "animation_suite": {"status": "PENDING_RUNTIME"},
             "accessories": {"status":"PASS_PRELIMINARY"},

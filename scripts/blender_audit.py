@@ -35,6 +35,7 @@ def parse_args():
     parser.add_argument("--joint-deformation", help="joint deformation regions, limits, and action sampling")
     parser.add_argument("--mesh-integrity", help="mesh boundary/opening and dynamic seam pair checks")
     parser.add_argument("--rig-stretch", help="bone stretch controls and pose-length diagnostics")
+    parser.add_argument("--height-profile", help="v8 主体高度检查；装饰物不计入高度")
     return parser.parse_args(argv)
 
 
@@ -313,6 +314,21 @@ def main():
         report["checks"]["skeleton"] = check_skeleton(rig, profile, report)
         report["checks"]["mesh_and_weights"] = {obj.name: check_mesh(obj, rig, profile, report) for obj in meshes}
         report["checks"]["bounding_boxes"] = scan_actions(meshes, rig, profile, bbox_conf, report)
+        # v8 body HEIGHT uses explicitly classified BODY geometry only. Do not
+        # silently skip mixed decorations; entire render bounds still include them.
+        if args.height_profile:
+            from blender_body_height_audit import audit as height_audit
+            try:
+                height_result = height_audit(load_json(args.height_profile))
+            except Exception as exc:
+                height_result = {"status": "FAIL", "reason": str(exc)}
+            report["checks"]["source_height"] = height_result
+            if height_result["status"] == "FAIL":
+                add(report, "errors", "BODY_HEIGHT_INVALID", "主体高度或装饰物排除规则不符合要求", details=height_result)
+            elif height_result["status"] in ("WARN", "PENDING"):
+                add(report, "warnings", "BODY_HEIGHT_REVIEW", "人体高度需接近当前默认探员；非人形主骨架应匹配本体高度", details=height_result)
+        else:
+            report["checks"]["source_height"] = {"status": "PENDING", "reason": "未提供主体与装饰物高度分类"}
         # v4: compare source-body anchors against target lengths, never against Valve agent proportions.
         if args.proportions and args.baseline:
             from blender_proportion_audit import audit as proportion_audit

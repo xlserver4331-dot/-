@@ -1,117 +1,104 @@
 ---
 name: cs2-model-rigging-deployment
-description: 面向 CS2 Source 2 AG2 自定义人物模型，保留原始身体四肢比例，自动检查/保守修复骨骼蒙皮、关节拉伸和网格裂口、装饰物辅助骨及全动作；从完整人物非破坏性裁剪第一人称手臂与衣袖，分别绑定 World/Viewmodel 骨架并验证 ModelDoc、私人服务器部署及游戏内动作。
+description: CS2 Source 2 / AnimGraph 2 双视角模型转模 Skill。先询问用户整体高度策略，人形可匹配当前默认探员主体高度或自选等比例缩放；非人形以主体网格和主骨架高度相符为准；装饰物不计主体身高但参与完整包围盒。保护原始四肢比例，检查/保守修复骨骼、权重、网格裂口、动态关节、装饰辅助骨、全部动画与死亡；从全身非破坏性提取第一人称手模，分别编译、部署并在私人本地游戏测试。
 ---
 
-# CS2 模型双视角转模、纠错与部署 Skill · v7
+# CS2 模型保比例双视角转模与本地验收 · Skill v8
 
-**最高优先级：原始人物比例 > CS2 探员默认长度。全身转模和第一人称手模均禁止拉伸四肢。所有写操作仅限用户明确许可的副本及私人 Addon，严禁直接覆盖 CS2 本体、规避反作弊或在官方匹配中部署替换模型。**
+**强制优先级：用户选择尺寸目标 → 原模型四肢比例 → 身体和主骨架对齐 → 无网格破口 → 双视角动画/运行时验证。** 禁止直接覆盖原模型、CS2 本体，禁止规避游戏反作弊或将私人测试结果描述为官方匹配支持。
 
-## 0 · 任务路由（只读相应章节，不要一次性盲跑）
+## 0. 启动时先询问高度方案（在任何主体尺寸审计之前）
 
-| 用户问题 | 首先阅读 | 执行入口 |
+**如果本轮用户没有明确选择，AI Agent 必须先问：**
+
+> 你希望模型采用哪种高度？**① 人形：整体高度尽量与当前 CS2 默认探员主体相同；② 使用你指定的主体目标高度；③ 按原模型全身 XYZ 同一倍数等比例缩放；④ 保留原始主体高度不变。** 同时请确认模型是人形还是非人形。装饰物不计入主体高度。无论选哪种方式，我都不会为了匹配默认探员而单独拉伸四肢。
+
+- 人形可选 ①–④；**非人形仅可选 ②–④**，不默认强制探员高度。非人形还必须让**主体骨架高度与主体网格高度相符**。
+- ① 需要从当前本机默认 CS2 探员资源**测得去装饰主体高度**；③/④ 需要从未经修改的源模型实测去装饰主体高度；② 需要用户明确给出目标数值，所有数值必须在同单位/上轴。**不能猜官方默认探员身高。**
+- **装饰物不参与高度判定**：头发、帽子、装饰角、尾饰、翅膀、背包、武器、外挂配件等；但必须进入完整渲染 AABB、骨骼/权重、动态边界、碰撞与穿模检查。原生生物身体结构与装饰的分类需人工确认。
+- 只允许整个模型、Armature、随动装饰和相应挂点采用**统一 XYZ 等比例缩放**，不能移动单个关节、拉长手脚或对某一根骨骼非均匀缩放以匹配默认探员。选择缩放计划**不等于已执行缩放**。
+- 将选择保存到 `config/height_profile.*.local.json` 的 `height_choice`，要求 `confirmed_by_user=true`。**Agent 不能自己替用户勾选。**
+
+**交互执行**：`python scripts/height_choice.py --profile config/height_profile.humanoid.local.json --save`。无人值守执行必须在用户已确认后显式提供 `--mode ... --confirm --save`；如果未设置选择，自动工作流在启动 Blender 尺寸检查之前返回 `NEEDS_HEIGHT_CHOICE`，不执行后续修复/部署。普通 `run` 在交互终端会主动显示选择菜单。参考 `references/v8-height-and-complete-workflow.md` 第 2 节。
+
+## 1. 根据问题选择阅读和模块
+
+| 用户意图 | 先读 | 脚本/配置 |
 | --- | --- | --- |
-| **从整个人物模型制作独立第一人称手模** | `references/v7-dual-viewmodel-extraction.md` | `blender_extract_firstperson.py` / `auto_workflow.py --extract-viewmodel` |
-| **第一人称手变形、丢失、还是默认手套** | `references/v7-dual-viewmodel-extraction.md` D–H | `blender_viewmodel_final_audit.py`、`dual_viewmodel_gate.py` |
-| 骨骼被拉长/网格破口/动态接缝 | `references/v6-stretch-crack-recovery.md` | `blender_rig_stretch_audit.py`、`blender_mesh_gap_audit.py`、`blender_seam_repair.py` |
-| 装饰物骨骼/自然摆动/肘膝塌陷 | `references/v5-accessories-joint-deformation.md` | `blender_accessory_audit.py`、`blender_joint_deformation.py` |
-| 原始四肢比例、完整动画、死亡和布娃娃 | `references/v4-proportions-animation-death.md` | `blender_proportion_audit.py`、`animation_suite.py` |
-| CS2 AG2 绑定、动画驱动、武器挂点 | `references/rigging-and-driving.md` | `blender_retarget_setup.py`、`blender_audit.py` |
-| 包围盒/ModelDoc/部署/启动 | `references/bounding-boxes.md`、`references/modeldoc-deployment.md`、`references/automation-and-launch.md` | `auto_workflow.py` |
-| 本地游戏内真实角色验收 | `references/game-self-test.md` | `game_qa.py`、`game_evidence_merge.py` |
+| **从零到游戏内完整转模、含高度先询问** | `references/v8-height-and-complete-workflow.md` | `scripts/height_choice.py` → `scripts/auto_workflow.py` |
+| 人体与默认探员同高 / 非人形主体骨架高 / 排除装饰物 | 上述手册 0–3 节 | `height_policy_core.py` / `blender_body_height_audit.py` / `config/height_profile.*` |
+| 骨骼拉伸、网格破口、动态接缝 | `references/v6-stretch-crack-recovery.md` | `blender_rig_stretch_audit.py`、`blender_mesh_gap_audit.py`、`blender_seam_repair.py` |
+| 装饰物骨骼、衣摆/头发、关节形变 | `references/v5-accessories-joint-deformation.md` | `blender_accessory_setup.py`、`blender_joint_deformation.py` |
+| 原四肢比例保护、动作、死亡/布娃娃 | `references/v4-proportions-animation-death.md` | `blender_proportion_audit.py`、`animation_suite.py` |
+| 原模型裁剪第一人称手臂 → 独立 Viewmodel 绑定 | `references/v7-dual-viewmodel-extraction.md` | `blender_extract_firstperson.py`、`blender_viewmodel_final_audit.py` |
+| CS2 骨骼/AG2、模型编译和本地部署 | `references/rigging-and-driving.md`、`references/modeldoc-deployment.md` | `blender_retarget_setup.py`、`auto_workflow.py` |
+| 客户端游戏内双视角、死亡与重生取证 | `references/game-self-test.md` | `game_qa.py`、`game_evidence_merge.py` |
 
-**当用户提供 `.blend` / FBX / ModelDoc / 运行日志时，先检查模型真实文件并报告错误对象与动作帧；没有提供真实模型时只交付工具和流程，明确 Blender/CS2 实机结果尚未验证。**
+**仅当用户提供模型源、参考数据或引擎日志时才报告真实检测结果。** 未提供文件时交付清晰步骤和可运行工具，不编造检测通过。
 
-## 1 · 依赖和可靠性原则
+## 2. 优化后的 S00–S13 串行工作流
 
-- Python 3.10+；Blender 需支持 Python / bmesh / FBX Export；CS2 Workshop Tools + 当前本机游戏参考模型；私人服务器和必要的允许的模型加载插件仅在游戏自检阶段需要。
-- 默认只读 / dry-run；**只有 `--execute` 才可以输出新 `.blend`、实际部署、编译或启动**。提取不自动改骨骼/权重、不会自动裁切未经手工标记的身体。
-- **游戏视角分离**：世界模型是完整人物；第一人称由同一原人物中裁剪出可见手臂/手掌/衣袖/手套几何，然后**换绑独立 viewmodel skeleton 并使用自身动作**。不要复用世界模型 Armature 来冒充视角切换。
-- 角色比例以原始文件的 Rest 骨长为基准；只允许人工确认的**统一整体缩放**；任何 Rest/动画四肢拉伸、IK Stretch、重复 Armature、裂口都应阻断。
-- BodyGroup、viewmodel skeleton、AG2 图和资源引用必须以**当前本机可运行 CS2 探员**为基准；旧教程示例不代表每次更新都兼容。**同一个 ModelDoc 中两套网格不保证游戏自动显示自定义第一人称。**
-- 只有真实引擎和观察者证据才能判定游戏内 `PASS`。截图像素差异只能作为线索。死亡/布娃娃在 World 侧；FPS 侧检查死亡隐藏与复活手模恢复。
-
-## 2 · v7 优化执行顺序（按依赖关系，不得跳级）
-
-| 阶段 | 内容 | 后置门禁 |
+| 阶段 | 必做内容 | 阶段门禁 |
 | --- | --- | --- |
-| **P0 原始归档** | 不可变全身源模型、SHA256、原始骨长与法线/UV/材质快照，标记真实错误帧 | 无原始基准禁止绑定 |
-| **P1 世界模型修复** | v6 拉伸/破口诊断 → v5 权重/装饰骨/关节动态 → v4 包围盒、动作、死亡、布娃娃 | World 关键项目均通过 |
-| **P2 FP 手臂提取** | 在原全身模型中为左右手臂、手指、衣袖画 `FP_KEEP` 掩码 → 自动复制与裁剪到**新副本** | `EXTRACTED_REQUIRES_RIGGING`，不允许部署 |
-| **P3 FP 独立骨架** | 导入/参考 `viewmodel.vnmskel` → 骨名/Rest 校准 → 不拉伸重定向 → Bake → 重新蒙皮 | 目标 Armature 与世界骨架分开 |
-| **P4 FP 专项动态 QA** | 肘/腕/手指、袖口、手套、握枪、瞄准、换弹、检视、枪械种类、动画伸长和 AABB | 无裂口/拉伸、原手臂比例正确 |
-| **P5 双资源导出** | `world_final.fbx` 与 `firstperson_final.fbx` 独立导出，核对源模型哈希；更新相应 ModelDoc Mesh/BodyGroup | 不允许发布旧 FBX |
-| **P6 双视角 ModelDoc 编译** | 共享 `.vmdl` 的 `first_or_third_person` BodyGroup，或独立 `.vmdl`；AG2 World/Viewmodel 参考、材质与资源编译 | 确认两套资源被引用，编译产物存在 |
-| **P7 私人服务器部署/启动** | 只向已创建的 `csgo_addons/<addon>` 按清单部署、备份与回滚；本地专用服启动 | 禁止修改本体；无客户端挂载不能宣称成功 |
-| **P8 游戏内双视角验收** | 第一/第三人称显示、idle/run/jump/crouch/turn、开火换弹/检视/刀具、受击/死亡 ragdoll/复活 | 分别记录 World PASS / Viewmodel PASS / Pending |
-| **P9 报告归档** | 审计前后 JSON、裂缝帧和顶点、各关节、两 FBX 哈希、编译日志、游戏截图、失败阻断及修复建议 | 无证据不得标 PASS |
+| **S00 选择高度方案** | 先确认人形/非人形及 ①–④；持久化用户选择 | 没有选择不能查目标模型尺寸 |
+| **S01 归档原型** | 只读原模型、SHA256、源 Rest 骨长、原始几何和单位/上轴，按需要测参考探员 | 缺基准禁止盲目重定向 |
+| **S02 主体/装饰分类** | 独立网格列表或 FACE `cs2_height_body` 属性；检查未分类 Mesh | 装饰物不计身高，完整渲染边界仍计入 |
+| **S03 按已选目标测主体高度** | 人形对用户目标；非人形另外比较主骨架高度与主体高度 | `height_choice` 模式/数值/源证据一致；FAIL 阻断 |
+| **S04 World 基础体检** | 骨骼层级、Rest Pose、约束、骨长、蒙皮、UV、法线、拓扑、静态裂缝 | 绝不为默认探员比例拉长四肢 |
+| **S05 修复和绑定** | 保比例重定向、权重归一、修正重复 Armature/IK、人工批准的精确接缝修复 | 只写副本，再审计 |
+| **S06 装饰物辅助骨** | 区分刚性/柔性骨链、权重和动作；检查穿模、伸长与运动跟随 | 装饰物独立检查并加入完整 Bounds |
+| **S07 动画与关节** | 肩肘腕髋膝踝指、跑跳转身、蹲射击换弹、受击、死亡过渡、ragdoll、复活 | 输出 Action/帧/顶点；失败返工 |
+| **S08 从整模提取 FPS 手模** | 人工 `FP_KEEP` 掩码、复制手臂手掌衣袖手套，审查肩切口 | 仅提取几何，不当可部署模型 |
+| **S09 FPS 独立骨架** | 本机 viewmodel 参考、独立蒙皮、Bake、握枪/换弹/检视 | FP 原手臂比例、关节/接缝合格 |
+| **S10 双资源导出和 ModelDoc** | 两 FBX、哈希、AG2/BodyGroup 或独立资源、编译 | 禁止 ModelDoc 引用旧 FBX |
+| **S11 私人 Addon 部署/启动** | dry-run → 受控 --execute；备份回滚 | 仅现有 Addon、当前编译产物 |
+| **S12 本地房间/私服游戏自测** | 实际加载 World+FP、完整动画、死亡、布娃娃、复活、截图/日志 | 两视角分别确认，不用截图代替 Hitbox |
+| **S13 报告归档** | 审计前/后差异、身高选择、身体/饰件 Bounds、动作异常、哈希与编译/游戏证据 | PENDING 不可当 PASS |
 
-**阶段耦合规则：** 世界模型变更后必须重新提取/审视对应第一人称几何；第一人称 `.blend` 变更后重新导出 `.fbx` 并重填哈希。不能在一个命令里边盲裁切、边修骨架、边部署。`--extract-viewmodel` 强制独立成轮，防止未经重定向的手模被加载到游戏。
+**变更失效规则：** 用户更改高度方案 ⇒ 必须重新测量主体高度及原比例，复查动画/关节/AABB，并更新导出、ModelDoc 和游戏内结果；换过 World 几何 ⇒ 重新审视 FP 提取是否仍同源；改过 FP `.blend` ⇒ 重新导出 FP `.fbx`、固定哈希并复检。旧尺寸报告不能用于新目标高度部署。
 
-## 3 · 首次初始化（路径全部为用户自填样例）
+## 3. 初始化文件与验证入口
 
-复制模板：
-
-- `config/workflow.player_dual.example.json` → `config/workflow.local.json`，指定真实路径、模型、检查配置及两套部署清单。必须把 `firstperson_source_blend_file` 设为从原始全身模型另存、含 `FP_KEEP` 掩码的工作副本；世界模型仍从 `blend_file` 单独读取。
-- `config/viewmodel_extraction.example.json` → `config/viewmodel_extraction.local.json`，填写原全身 Mesh、Mask 与审核后的肩部裁断位置。
-- `config/dual_viewmodel.example.json` → `config/dual_viewmodel.local.json`，填写独立 FP 网格、骨架对象、提取报告、ModelDoc 和部署条件。
-- `config/firstperson_bone_map.example.json` → `config/firstperson_bone_map.local.json`，用**当前本机参考**替换示例骨名，并将映射标记人工审核。
-- 复制其余 `ag2_profile/proportions/mesh_integrity/rig_stretch/joint_deformation/accessories/bbox_rules/animation_suite/game_test` 模板供 World 与 FP **分别使用**。提供真正的原模型比例基准，不要直接沿用示例阈值判 PASS。
-
-参考 `references/v7-dual-viewmodel-extraction.md` C 节用 Blender 的 Edit Mode / Vertex Groups 人工标定手臂区域；如果模型只有 `Body` 一个 Mesh，删除提取配置中不存在的 `Sleeves` 模板条目。
-
-## 4 · 命令和检查入口
+1. 从模板复制自己的 `*.local.json`：`workflow.player_dual`、`height_profile.humanoid/nonhumanoid`、`proportions`、`ag2_profile`、`mesh_integrity`、`rig_stretch`、`joint_deformation`、`accessories`、`animation_suite`、`bbox_rules`、`viewmodel_extraction`、`dual_viewmodel`、`game_test`；所有骨名/对象名/地址必须按**真实本机资源**改，不要把示例认为官方固定 API。
+2. `workflow.local.json` 的 `height_profile` 必须指向自己的高度配置。人形默认探员参考先用 `blender_body_height_audit.py --capture-reference` 测本机标准探员主体；统一倍率/保持原高则先 `--capture-original` 测未改原模型主体。
+3. 执行 `height_choice.py --profile ... --save` **在任何主体大小审计之前**；报告仅给建议缩放倍数，具体 Blender 调整须在审核后的副本中统一应用；非人形还要独立修主骨架布局。
 
 ```powershell
-# 0. 环境预检（不修改原模型）
+# 校验 Skill 和环境
+python scripts/validate_skill.py
+python -m unittest discover -s tests -v
 python scripts/auto_workflow.py doctor --config config/workflow.local.json
 
-# 1. 完整模型先修 P1；必要时单独运行 v6 裂口/拉伸修复
+# 主体高度方案已经确认才执行 World 审计
 python scripts/auto_workflow.py run --config config/workflow.local.json
 
-# 2. 从完整人物做第一人称手臂裁剪，先只读预演
+# 保守修复前先模拟：不得盲补洞，接缝必须给定批准顶点对
+python scripts/auto_workflow.py run --config config/workflow.local.json --repair-seams --fix
+
+# 经人工检查相应副本和资源导出条件后，另存并重新审计
+python scripts/auto_workflow.py run --config config/workflow.local.json --repair-seams --fix --execute
+
+# 完整人物裁剪第一人称模型必须单独进行
 python scripts/auto_workflow.py run --config config/workflow.local.json --extract-viewmodel
 python scripts/auto_workflow.py run --config config/workflow.local.json --extract-viewmodel --execute
 
-# 3. 人工在生成的 firstperson_cut_preview.blend 中重绑到独立 Viewmodel rig，修完并另存新 .blend；导出单独 FP FBX
-# 4. 锁定新 .blend 和 FP FBX 的实际 SHA256（有备份）
-python scripts/pin_viewmodel_export.py --dual config/dual_viewmodel.local.json --workflow config/workflow.local.json
+# 人工完成独立 FP Rig/动作后，更新哈希及 ModelDoc 两 FBX 引用
 python scripts/pin_viewmodel_export.py --dual config/dual_viewmodel.local.json --workflow config/workflow.local.json --execute
 
-# 5. 双视角 Blender 审计、AG2/网格/比例/关节检查
-python scripts/auto_workflow.py run --config config/workflow.local.json
-
-# 6. 本地部署、编译、启动与游戏测试，先 dry-run
+# 先模拟部署及启动，再经授权实际执行
 python scripts/auto_workflow.py run --config config/workflow.local.json --deploy --compile --launch --game-test
-
-# 7. 只在已配置真实私人环境、备份与操作授权后执行
 python scripts/auto_workflow.py run --config config/workflow.local.json --deploy --compile --launch --game-test --execute
 ```
 
-**`--extract-viewmodel` 只负责从原始完整 Mesh 提取有蒙皮的几何副本**。它会保留 UV、材质与已有原骨架权重，但不创建已验证的 FPS Armature，也不生成 `viewmodel` 动画。此后必须手动完成骨骼重定向、权重/握枪动作修正与独立源资源导出。提交部署前双模型门禁会校验独立 FP 审计、SHA256、ModelDoc/BodyGroup、编译清单。
+`--fix` 的自动权重归一不会自动制作 FP 骨架；仅在 `auto_export_fbx.enabled=true` 且 ModelDoc FBX 引用确认时才会重导出 World FBX。没有可信 `modeldoc` 引用或实际播放器加载路径，不能声称“部署已经在游戏内生效”。脚本不会自动统一缩放原模型，仅报告倍数，避免破坏父子/动画变换。详细命令和失败回退见 `references/v8-height-and-complete-workflow.md`。
 
-## 5 · 强制检查与安全纠错
+## 4. 自动纠错边界与验收标准
 
-1. **骨骼/权重**：原始骨长（含左右上下臂、大腿、小腿）、Rest/Pose 比例、骨骼父子关系、无效顶点组、未绑定点、权重归一、重复 Armature、IK Stretch、Copy Scale。
-2. **网格破口/关节**：静态开放边、缺面、非流形、异常法线、动态 seam gap、肩肘腕髋膝踝手指边长/面积压缩、袖口/手套接缝；报告精确 `mesh + vertex + Action + frame`。
-3. **装饰骨**：头发、衣摆、配饰按刚性或柔性链配置，检查权重、动作跟随和不拉长；不能未经验证就声明 Source 2 动态物理支持。
-4. **动画**：World（跑跳、攀/蹲、换弹、射击、受击、死亡、布娃娃、复活）与 FP（握持、切枪、后坐力、开火、换弹、检视、手指、死亡手模隐藏/复活显示）**分开评分**。
-5. **包围盒**：World/FP 静态 AABB、动作采样动态 AABB、渲染 Bounds、Hitbox、Physics/Collision 分别检查；真实 Hitbox 需引擎证据。
-6. **仅允许自动修复**：有可靠有效权重的归一化；或经人工指定顶点对、哈希/UV/材质/权重全面校验的接缝焊接，且只写入**新副本**。不自动猜骨长、重绘整个蒙皮、全网格补洞或为匹配默认探员拉长四肢。
+- **可安全自动尝试**：已有有效权重归一；用户审核过的接缝顶点对在坐标、法线/UV/材质/权重等约束满足时局部焊接；用户提供位置的装饰骨初始权重。任何操作只写新副本且复检。原比例、缩放模式、ModelDoc 引用、原模型哈希等关键门禁缺失即停止。
+- **不能自动猜**：默认探员身高数字、主体/饰件语义分类、角色四肢骨长、复杂网格补洞、动画重定向的真实骨轴、FP 肩截断、ragdoll Physics / Hitbox、游戏内 FP 资源替换插件能力。
+- **Source 2 验收**：静态/动态渲染 Bounds 之外必须检查 Physics 和 Hitbox；第一人称/第三人称分别验收；死亡布娃娃与复活独立确认；所有未验证的引擎结果保留 `PENDING_RUNTIME`。
+- **本地安全**：私人服务器、只允许本机/用户授权环境；不要在正式 Valve 匹配启用可疑资源替换；`sv_cheats 1` 并不是任何自定义资源的加载机制。
 
-## 6 · 双视角发布门禁与故障路由
+## 5. 验证结果的真实含义
 
-- 玩家模型一旦要求 `--deploy/--compile/--launch/--game-test`：必须提供 `dual_viewmodel`，并核对 `viewmodel_blend_file`、独立第一人称检查及两个 SHA256；ModelDoc 当前引用两套 FBX，部署清单中存在 FP FBX，编译清单核验目标 `.vmdl_c`。**缺任意一项阻止自动发布**。
-- 当共享 `.vmdl`：`packaging_mode=shared_bodygroup`，必须审核 BodyGroup、`viewmodel.vnmskel` 和 AG2 映射；也支持 `packaging_mode=separate_vmdl`，需核对独立 `.vmdl_c`。这两个设置属于**工程方案**，必须以用户当前 CS2 资源实测，不是“自动在客户端生效”承诺。
-- 当 FPS 手是默认的、T-pose、袖口分离或开枪时被拉长：阅读 `references/v7-dual-viewmodel-extraction.md` 的 H 节。禁止直接改世界模型手臂长度。
-- 本地私服插件只支持 World 换模时，游戏自检必须报告 `PENDING_RUNTIME_VIEWMODEL`，不可宣称整个 Skill 已完成游戏内换手。
-- 所有修复和部署记录 `reports/run_*/workflow_result.json`，独立 FPS 的 `firstperson_extraction.json` 和 `firstperson_final_audit.json`，编译日志与游戏内截图另存。任何真实游戏运行/服务器权限缺失都应解释清楚。
-
-## 7 · 自检
-
-```powershell
-python scripts/validate_skill.py
-python -m unittest discover -s tests -v
-```
-
-这些是**离线静态与模拟测试**，不证明真实 Blender/ModelDoc/CS2 已编译或正常切换视角。参照 `references/sources.md` 与 v7 参考链接确认游戏版本差异；不要直接复制旧教程的 AnimGraph 1 配置。
+`python scripts/validate_skill.py` 和 `unittest` 只表示文件结构、逻辑、模拟编排通过。没有用户本机 Blender/CS2/ModelDoc 的真实模型与动作数据时，禁止写“已实机通过”。具体最新工具链、骨名和 AG2 结构以用户当前 CS2 安装中的可运行参考为准。

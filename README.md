@@ -1,116 +1,91 @@
-# CS2 人物模型双视角转模与部署工具 · v7
+# CS2 模型转模 / 双视角 / 本地部署 Skill v8
 
-本项目是一套面向 CS2 Source 2 / AG2 自定义人物的工作流程、Blender 审计脚本、配置模板和测试。它以**原人物比例**为基准，分别处理第三人称完整人物和第一人称手臂，协助检查蒙皮、关节、裂口、动画、资源引用与私人环境部署。
+这是一个适用于支持 `SKILL.md` 的 Agent 的可安装技能包。包含模型检查、保守修复、模型尺寸选择、装饰物骨骼、运动关节形变与破口、第一人称从完整人物裁剪、独立 viewmodel 绑定指引、Source 2 编译和私人本地测试的完整工作流。
 
-> **当前状态：v7 工作流程与离线工具。** 提取脚本生成的是待绑定的手臂几何预览，不是可直接部署的第一人称手模。编译成功也不等于游戏已加载。真实 Blender、ModelDoc 和游戏结果必须由对应的实际测试确认。
+## v8 重点更新
 
-## 能做什么
+**先问后检**：在任何主体高度检测前，用户先确认人形或非人形及身高方案。可选“匹配本机默认探员**主体**高度”“自定义主体目标高度”“全身统一倍数缩放”“保持原始主体高度”；非人形不强制与默认探员等高，但主骨架垂直跨度必须与主体网格相符。**装饰物不计高度**，但仍纳入完整渲染 AABB、动态碰撞/权重及动画检查。
 
-- 从原始人物副本中，根据人工标记的区域提取左右手臂、手掌、手指和衣袖，保留支持的数据作为第一人称几何基础。
-- 分别检查世界模型与第一人称模型的骨架、权重、原始比例、关节变形、网格裂口和动画采样。
-- 对符合条件的问题进行保守处理，例如有效权重归一化，以及经人工指定并校验的局部接缝修复；结果写入新副本。
-- 协助检查双资源导出、ModelDoc 引用、文件哈希、部署清单与编译产物，并记录报告。
-- 在具备实际环境和授权时，辅助私人服务器的双视角验收；世界模型和第一人称手模分别记录结果。
+此前出现的手脚拉长、肘膝裂缝、衣袖/手套错位、FPS 手模仍然显示默认手、死亡 ragdoll 错乱，都有独立门禁。**Skill 不会自行修改比例或自动替你生成已验证的第一人称动画。**
 
-**不自动完成**第一人称骨架重定向、可靠的手部权重调整、武器握持动画或游戏运行时的手模接管。不同 CS2 版本和服务器插件的资源结构、加载能力可能不同，必须依据本机可运行的参考资源验证。
+## 从哪里开始
 
-## 使用原则
-
-1. 保留未经修改的原始模型与备份，以原模型 Rest 骨长为比例基准；不要为了匹配默认探员而拉长四肢。
-2. 世界模型使用完整人物；第一人称几何从同一原人物的工作副本裁剪，再绑定**独立的 Viewmodel 骨架**并单独导出。
-3. 默认运行是只读检查或预演；需要写入新模型、部署、编译或启动的步骤使用 `--execute`，并先检查配置、路径与备份。
-4. 只在获授权的副本和私人 Addon 环境中操作；不要覆盖游戏本体、规避反作弊或在官方匹配中部署替换模型。
-5. 使用真实引擎和观察证据判断运行时结果；没有足够证据时应记录待验证，而不是标记通过。
-
-## 环境要求
-
-| 组件 | 用途 |
-| --- | --- |
-| Python 3.10 或更高版本 | 运行工作流、离线检查与测试 |
-| 支持 Python、bmesh 和 FBX 导出的 Blender | 处理与审计模型；使用本机实际可执行文件路径 |
-| CS2 Workshop Tools 和本机当前版本的参考资源 | ModelDoc、AG2 资源核对与编译 |
-| 已配置的私人 Addon / 测试环境 | 需要实际部署和游戏验收时使用 |
-
-核心脚本主要依赖 Python 标准库与 Blender 自带 Python。`requirements-game.txt` 列出游戏界面自动化及截图所需的可选依赖；只有需要该功能时才安装，并参照 `references/game-self-test.md` 配置。
-
-## 目录说明
-
-| 路径 | 内容 |
-| --- | --- |
-| `SKILL.md` | 技能入口、任务路由、阶段顺序和门禁 |
-| `config/` | 示例配置；复制为 `.local.json` 后填写本机路径和模型数据 |
-| `scripts/` | Blender 审计、提取、工作流、部署检查与报告脚本 |
-| `references/` | 绑定、比例、裂口、双视角、部署和游戏验收指南 |
-| `tests/` | 离线单元测试与模拟工作流测试，不代表实机验收 |
-| `templates/` | 引擎验证报告模板 |
-| `run_skill.ps1` | PowerShell 工作流入口，参数说明见脚本与自动化指南 |
-| `MANIFEST.sha256.json` | 包内文件的大小和 SHA-256 清单 |
-| `.gitignore` | 排除本地配置、报告、缓存和常见模型文件 |
-
-重点阅读 [`references/v7-dual-viewmodel-extraction.md`](references/v7-dual-viewmodel-extraction.md)、[`references/automation-and-launch.md`](references/automation-and-launch.md) 和 [`references/game-self-test.md`](references/game-self-test.md)。骨骼拉伸与裂口问题另见 [`references/v6-stretch-crack-recovery.md`](references/v6-stretch-crack-recovery.md)。
-
-## 配置与工作流程
-
-以下命令在本项目根目录的 PowerShell 中运行。示例路径仅作说明，必须替换为实际文件；不要直接把示例阈值当作模型验收标准。
-
-### 1. 归档与准备
-
-备份原始全身模型，记录 SHA-256、原始骨长和问题动作帧。世界模型修复、第一人称提取均在独立工作副本上进行。先完成世界模型的比例、蒙皮、裂口和动作检查。
-
-复制 `config/workflow.player_dual.example.json` 为 `config/workflow.local.json`；同样复制 `viewmodel_extraction.example.json`、`dual_viewmodel.example.json`、`firstperson_bone_map.example.json` 和所需的其他配置模板为 `.local.json`。填写真实 Blender、CS2、模型、Addon 和审计配置路径。配置字段和阶段要求详见 `SKILL.md`。
-
-在从原全身模型另存的提取工作副本中，人工标记 `FP_KEEP_L`、`FP_KEEP_R` 等顶点组；保留所需手指、手套和衣袖，人工审核位于相机视野外的肩部截断。将 `firstperson_source_blend_file` 指向该工作副本，世界模型仍由 `blend_file` 单独指定。
-
-### 2. 预检和提取
+先读：`SKILL.md`（Agent 入口）及 `references/v8-height-and-complete-workflow.md`（可直接照做的完整流程）。
 
 ```powershell
+# 复制本地配置示例，绝不要直接覆盖 .example.json
+Copy-Item config/height_profile.humanoid.example.json config/height_profile.humanoid.local.json
+Copy-Item config/workflow.player_dual.example.json config/workflow.local.json
+
+# 修改这两份 .local.json 的真实路径、人体/装饰物对象、CS2 参考值和本机工具路径
+# 在模型身高审计之前必须询问尺寸策略并保存，命令会显示可选项
+python scripts/height_choice.py --profile config/height_profile.humanoid.local.json --save
+
+# 检查与只读扫描
 python scripts/validate_skill.py
 python scripts/auto_workflow.py doctor --config config/workflow.local.json
 python scripts/auto_workflow.py run --config config/workflow.local.json
-python scripts/auto_workflow.py run --config config/workflow.local.json --extract-viewmodel
 ```
 
-检查提取报告中的选中面和边界；确认掩码与截断后，再单独执行：
+**注意：** 只有完整配置的 Blender、真实角色源 `.blend`、本机当前 CS2 参考资源与私人 Addon 才能执行真正的编译和游戏自检。执行前先 dry-run；`--execute` 写文件/启动进程时要明确授权。第一人称手臂裁剪后还需独立 viewmodel Rig、蒙皮/动画制作、ModelDoc 引用检查，不能直接拿预览裁剪文件部署。
 
-```powershell
-python scripts/auto_workflow.py run --config config/workflow.local.json --extract-viewmodel --execute
-```
+## 重要文件
 
-提取结果是 `firstperson_cut_preview.blend` 和报告。它仍需人工换绑、校准 Rest 姿势、调整权重及动作；不应直接作为可部署手模。含 Shape Keys 的网格可能被拒绝自动裁剪，具体以提取报告为准。
+- `scripts/height_choice.py`：互动询问模式并写入带备份的 `*.local.json`，无交互必须明确 `--confirm`。
+- `scripts/height_policy_core.py`：纯 Python 检查所选高度目标与非人形骨架跨度，不修改模型。
+- `scripts/blender_body_height_audit.py`：分主体/装饰、计算主体与全部视觉 Bounds，支持原模型/默认探员参考捕获。
+- `scripts/auto_workflow.py`：预检、审计、保守修复、导出、部署、编译、启动与本机取证统一调度，并阻止新高度方案复用旧审计报告。
+- `references/v8-height-and-complete-workflow.md`：**从零开始的 S00–S13 完整工作步骤与失败回退**。
+- `references/v4-*` / `v5-*` / `v6-*` / `v7-*`：原始四肢比例、死亡、装饰骨、动态接缝及第一人称制作详细技术手册。
 
-### 3. 独立绑定、导出和检查
+**真实验证范围：** 可在普通 Python 环境完成的测试只覆盖逻辑与模拟工作流；真实 Blender 与 CS2 仍需用户实际文件和本地引擎验证。
 
-从当前可运行的 CS2 参考资源确认 Viewmodel 骨架、层级和 AG2 关系。在新副本中完成独立骨架绑定、权重与动作，检查肘、腕、手指、袖口和持枪姿势，保持原人物肢体比例。分别导出世界模型与第一人称 FBX，检查 ModelDoc 对两套资源的实际引用。
+## 使用原则与高度选择
 
-对最终第一人称 `.blend` 和 `.fbx` 固定 SHA-256，并在修改后重新导出、更新哈希和复检：
+运行主体高度检查前，先确认模型类型和用户选择：人形可以选择匹配本机当前默认探员的主体高度、指定目标高度、整体等比例缩放或保持原高；非人形选择后三种，并另外检查主体网格与主骨架的垂直跨度。目标高度、单位和参考来源必须真实测量或由用户提供，不预设官方身高数值。
 
-```powershell
-python scripts/pin_viewmodel_export.py --dual config/dual_viewmodel.local.json --workflow config/workflow.local.json
-python scripts/pin_viewmodel_export.py --dual config/dual_viewmodel.local.json --workflow config/workflow.local.json --execute
-python scripts/auto_workflow.py run --config config/workflow.local.json
-```
+头发、帽子、翅膀、背包等装饰物不计入主体高度，但仍须计入完整渲染边界和相关动态检查；身体结构与装饰的分类由使用者确认。调整尺寸只采用整个角色的 XYZ 统一比例，不单独拉长四肢。高度工具记录选择和提供测量建议，不会自动对模型施加缩放。
 
-### 4. 私人环境部署和验收
+原始模型应归档并保留哈希。所有修复在副本上进行，重新审计后再导出；不要覆盖 CS2 本体或在官方匹配中使用替换模型。
 
-确认部署清单、备份、资源引用、编译目标和环境授权后，先预演：
+## 环境和目录
 
-```powershell
-python scripts/auto_workflow.py run --config config/workflow.local.json --deploy --compile --launch --game-test
-```
+| 项目 | 说明 |
+| --- | --- |
+| Python 3.10+ | 运行离线工具、配置与测试 |
+| Blender | 需要支持 Python、bmesh、FBX 导出，按本机路径配置 |
+| CS2 Workshop Tools / ModelDoc | 编译和核对与本机版本匹配的资源 |
+| 私人 Addon 和测试环境 | 仅在实际部署和游戏验收时需要 |
+| `requirements-game.txt` | 游戏界面自动化和截图的可选依赖 |
 
-检查计划和阻断原因后，才按实际需要追加 `--execute`。游戏内分别检查世界模型与第一人称的显示、移动、持枪、开火、换弹、检视、死亡与复活；记录日志和截图。若插件只支持世界模型替换，第一人称应保持 `PENDING_RUNTIME_VIEWMODEL`。
+| 目录或文件 | 用途 |
+| --- | --- |
+| `SKILL.md` | Agent 工作入口、阶段门禁和操作范围 |
+| `config/` | 高度、模型、双视角与工作流示例配置；复制后填写本机数据 |
+| `scripts/` | 选择高度、Blender 审计、工作流、导出检查和取证脚本 |
+| `references/` | v4–v8 详细技术手册与 ModelDoc、游戏自测说明 |
+| `tests/` | 离线逻辑和模拟工作流测试 |
+| `templates/` | 引擎验证报告模板 |
+| `MANIFEST.sha256.json` | 文件 SHA-256 清单 |
+| `run_skill.ps1` | PowerShell 工作流入口 |
 
-## 测试与已知限制
+## 从完整模型到游戏验收
+
+1. 确认高度方案、备份源模型并测量原始骨长；按需要测量本机默认探员主体参考。
+2. 人工分类主体与装饰物，测量主体高度，检查世界模型骨架、权重、关节和裂口；需要修复时先预演，在副本上操作后复检。
+3. 在完整人物工作副本中人工标记 `FP_KEEP` 手臂区域，先预演、再单独提取。预览结果尚未绑定第一人称骨架。
+4. 在 Blender 中人工完成独立 Viewmodel 骨架、蒙皮和动作；分别导出 World 与 Firstperson FBX，核对哈希、ModelDoc 和 AG2 资源引用。
+5. 在授权的私人 Addon 中先预演部署、编译和启动；确认目标后才使用 `--execute`。分别记录 World 和第一人称的加载与动作结果；没有运行时证据时保持 `PENDING`。
+
+完整配置字段、命令与回退步骤见 [v8 完整工作流](references/v8-height-and-complete-workflow.md)，第一人称制作见 [v7 手模指南](references/v7-dual-viewmodel-extraction.md)。
+
+## 离线测试和已知限制
 
 ```powershell
 python scripts/validate_skill.py
 python -m unittest discover -s tests -v
 ```
 
-结构校验已通过。在一次 Windows 环境的离线测试中，使用项目内可写临时目录并启用 Python UTF-8 模式后，85 项中 78 项通过，7 项模拟集成测试失败：测试使用的 Unix 风格模拟可执行文件无法由 Windows 直接运行。部分测试还依赖系统默认文本编码，中文 Windows 下可能产生解码错误。上述问题尚未修复；离线结果不能证明 Blender、ModelDoc 或 CS2 实机通过。
+本次 Windows 环境中，结构校验通过。将临时目录设为可写并启用 Python UTF-8 模式后，115 项离线测试中 108 项通过、7 项模拟集成测试失败；失败涉及 Unix 风格模拟可执行文件在 Windows 下无法直接启动。部分测试还可能受 Windows 默认文本编码影响。这些兼容问题尚未修复；离线测试不代表真实 Blender、ModelDoc 或 CS2 运行通过。
 
-若系统临时目录不可写，可在运行测试前将 `TEMP` 和 `TMP` 指向有写权限的临时目录；这只能处理临时目录权限，不会修复上述测试兼容问题。
-
-## 数据与发布
-
-示例配置中的路径、骨骼名称、阈值和资源引用都必须按实际工程核对。不要将个人机器路径、本地配置、模型素材、游戏资源或报告无意上传至公开仓库；`.gitignore` 只影响尚未被 Git 跟踪的文件，上传前仍应检查文件列表及内容。使用模型和游戏资源时，确认其来源及适用授权。
+公开上传前，请检查文件清单，不要上传个人路径、本地配置、原始模型、游戏资源或测试报告。`.gitignore` 只影响未被 Git 跟踪的文件，不替代人工检查；确保使用的模型和资源具有适当授权。

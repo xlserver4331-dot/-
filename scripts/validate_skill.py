@@ -5,6 +5,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = [
     "SKILL.md", "README.md", "config/ag2_profile.example.json",
+    "config/height_profile.humanoid.example.json", "config/height_profile.nonhumanoid.example.json",
+    "config/height_profile.mixed_mesh.example.json", "config/height_reference_agent.example.json",
+    "scripts/height_policy_core.py", "scripts/height_choice.py", "scripts/blender_body_height_audit.py",
+    "references/v8-height-and-complete-workflow.md", "tests/test_v8_height.py", "tests/test_v8_height_choice.py",
     "config/viewmodel_extraction.example.json", "config/dual_viewmodel.example.json", "config/firstperson_bone_map.example.json", "config/workflow.player_dual.example.json",
     "scripts/viewmodel_core.py", "scripts/blender_extract_firstperson.py", "scripts/blender_viewmodel_final_audit.py",
     "scripts/dual_viewmodel_gate.py", "scripts/pin_viewmodel_export.py", "references/v7-dual-viewmodel-extraction.md", "tests/test_v7_firstperson.py",

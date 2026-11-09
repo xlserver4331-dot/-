@@ -1,0 +1,22 @@
+{
+  "model_type": "humanoid",
+  "armature": "CS2_Rig",
+  "up_axis": "Z",
+  "exclude_accessories_from_height": true,
+  "body_mesh_objects": [],
+  "accessory_mesh_objects": [
+    "Backpack"
+  ],
+  "mixed_meshes": [
+    {
+      "object": "BodyWithHair",
+      "body_face_attribute": "cs2_height_body"
+    }
+  ],
+  "ignored_mesh_objects": [],
+  "agent_reference_body_height": null,
+  "warn_relative_deviation": 0.01,
+  "fail_relative_deviation": 0.03,
+  "notes": "在 Blender Mesh Attributes 中创建 FACE 域 Boolean/Int 属性 cs2_height_body；人体主体面设 1，头发帽子等装饰面设 0。脚本要求两类面同时存在并严格检查未分类 Mesh。 提前通过 height_choice.py 询问用户并明确保存缩放目标。",
+  "height_choice": null
+}
