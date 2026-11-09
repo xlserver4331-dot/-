@@ -1,0 +1,14 @@
+{
+  "steps": {
+    "idle": {
+      "reference_image": "D:/my_models/qa_reference/idle.png",
+      "crop_relative": [0.28, 0.12, 0.75, 0.92],
+      "max_mean_pixel_delta": 30.0
+    },
+    "crouch": {
+      "reference_image": "D:/my_models/qa_reference/crouch.png",
+      "crop_relative": [0.28, 0.12, 0.75, 0.92],
+      "max_mean_pixel_delta": 30.0
+    }
+  }
+}

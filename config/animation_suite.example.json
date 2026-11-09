@@ -1,0 +1,37 @@
+{
+  "notes": "Keep states with mode=runtime_only if CS2/AG2 drives them without standalone Blender Actions. Death often transitions into ragdoll physics. Map source_action only if a real clip was exported.",
+  "tracks": {
+    "worldmodel": [
+      {"id": "idle", "mode": "action_optional"},
+      {"id": "walk", "mode": "action_optional"},
+      {"id": "run", "mode": "action_optional"},
+      {"id": "crouch", "mode": "action_optional"},
+      {"id": "crouch_move", "mode": "action_optional"},
+      {"id": "jump_start", "mode": "action_optional"},
+      {"id": "airborne", "mode": "action_optional"},
+      {"id": "land", "mode": "action_optional", "kind": "transition"},
+      {"id": "turn", "mode": "action_optional"},
+      {"id": "aim", "mode": "action_optional"},
+      {"id": "fire", "mode": "action_optional"},
+      {"id": "reload", "mode": "action_optional"},
+      {"id": "weapon_switch", "mode": "action_optional"},
+      {"id": "knife_attack", "mode": "action_optional"},
+      {"id": "grenade_throw", "mode": "action_optional"},
+      {"id": "hit_react", "mode": "runtime_only", "kind": "external_event"},
+      {"id": "death_transition", "mode": "runtime_only", "kind": "transition"},
+      {"id": "ragdoll_fall", "mode": "runtime_only", "kind": "physics"},
+      {"id": "ragdoll_rest", "mode": "runtime_only", "kind": "physics"},
+      {"id": "respawn", "mode": "runtime_only", "kind": "transition"}
+    ],
+    "viewmodel": [
+      {"id": "arms_idle", "mode": "runtime_only"},
+      {"id": "weapon_draw", "mode": "runtime_only"},
+      {"id": "weapon_fire", "mode": "runtime_only"},
+      {"id": "weapon_reload", "mode": "runtime_only"},
+      {"id": "weapon_inspect", "mode": "runtime_only"},
+      {"id": "knife_draw_attack", "mode": "runtime_only"},
+      {"id": "grenade_equip_throw", "mode": "runtime_only"},
+      {"id": "death_view_transition", "mode": "runtime_only", "kind": "transition"}
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "reviewed": false,
+  "source_rig": "OriginalCharacterRig_REPLACE",
+  "target_rig": "CS2_ViewmodelRig_REPLACE",
+  "mapping": {
+    "Source_UpperArm_L_REPLACE": "Target_UpperArm_L_REPLACE",
+    "Source_Forearm_L_REPLACE": "Target_Forearm_L_REPLACE",
+    "Source_Hand_L_REPLACE": "Target_Hand_L_REPLACE",
+    "Source_UpperArm_R_REPLACE": "Target_UpperArm_R_REPLACE",
+    "Source_Forearm_R_REPLACE": "Target_Forearm_R_REPLACE",
+    "Source_Hand_R_REPLACE": "Target_Hand_R_REPLACE"
+  },
+  "notes": "以上名称不是官方 CS2 固定骨名！必须从你本机导出的当前 viewmodel.vnmskel 获取真实骨名、层级、Rest 姿势，并逐项人工确认。先重定向/烘焙动作，再审计，禁止拉长手臂凑握枪位置。"
+}

@@ -1,0 +1,18 @@
+{
+  "approved_open_meshes": [],
+  "candidate_rest_distance": 0.0005,
+  "max_candidates": 100,
+  "sample_step_frames": 3,
+  "max_frames_per_action": 60,
+  "require_reviewed_seams": false,
+  "reviewed_seam_pairs": [
+    {
+      "id": "left_elbow_sleeve_SEAM_EXAMPLE_REPLACE",
+      "a": ["BodyMesh", 240],
+      "b": ["SleeveMesh", 122],
+      "max_pose_gap": 0.007,
+      "max_gap_growth": 0.004
+    }
+  ],
+  "notes": "仅示例：必须按自己的模型确定 object、顶点索引、Blender 长度单位和阈值；若未配置动作或未校准，必须 PENDING 而非通过。袖口和衣领自然开口请先人工确认，再列入 approved_open_meshes（该操作仅接受已检查的网格整体开口，不是自动封闭）。"
+}

@@ -1,0 +1,125 @@
+{
+  "target": "player_runtime",
+  "model_id": "REPLACE_ME",
+  "cs2_build_checked": "",
+  "addon_name": "",
+  "model_logical_path": "",
+  "authorized_to_use_model": false,
+  "tests": {
+    "modeldoc_compiled": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "保存编译日志和 .vmdl_c 输出路径"
+    },
+    "mesh_materials_visible": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "附 ModelDoc/游戏预览截图"
+    },
+    "static_bounds_reviewed": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "确认空间、单位和参考 AABB"
+    },
+    "dynamic_bounds_reviewed": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "idle/walk/run/jump/crouch/aim 等动作极值"
+    },
+    "physics_collision_reviewed": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "物理体形状和游戏接触行为，不能用视觉 AABB 替代"
+    },
+    "hitboxes_reviewed": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "在允许的本地测试环境验证命中区域"
+    },
+    "ag2_binding_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "非 T-pose；保存视频/游戏日志"
+    },
+    "weapon_alignment_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "主武器/手枪/刀和左右手对应姿态"
+    },
+    "local_server_mounted": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "记录挂载 ID/专用服日志/客户端资源加载"
+    },
+    "movement_animation_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "待机/跑跳/蹲伏/瞄准/开枪/换弹/换武器"
+    },
+    "hammer_local_preview": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "仅 prop_preview 必须"
+    },
+    "original_limb_proportions_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "用原人物比例如实检查肩、肘、腕、髋、膝、踝；禁止拉伸为默认探员比例；需要绑定与动态帧证据"
+    },
+    "viewmodel_arms_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "第一人称手、手套、手腕、手指、武器手柄与视野裁剪；同样不能强拉骨长"
+    },
+    "viewmodel_animation_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "第一人称 draw/fire/reload/inspect/knife/weapon_swap 逐动作视频或截图"
+    },
+    "hit_reaction_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "本地模拟受击事件；需可见世界模型的观察者证据"
+    },
+    "death_transition_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "死亡前后状态/AG2/根骨骼变换；不等同于布娃娃"
+    },
+    "ragdoll_physics_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "第三人称观察者记录倒地/落地/接触/静止；不穿地面、不爆炸式拉伸，需物理证据"
+    },
+    "respawn_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "复活后的骨骼/权重/第一人称重新挂载/武器姿态，无永久变形"
+    },
+    "animation_suite_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "完整动作清单实际覆盖：移动、蹲跳、瞄准、射击、换弹、受击、死亡、复活"
+    },
+    "accessory_motion_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "逐动作确认头发/饰品/披风等真实跟随和次级摆动：跑、急转、蹲跳、射击、死亡/布娃娃；须观察者视频或引擎调试记录；Blender 物理不可直接等同游戏物理"
+    },
+    "joint_deformation_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "第三人称/第一人称检查肩、肘、腕、髋、膝、踝、颈、手指在极限动作时的压扁、拉丝、穿模、自交、体积损失及死亡姿态，需视频/调试证据"
+    },
+    "mesh_cracks_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "世界模型/第一人称手模关节处破口：动作前、中、后关键帧视频及与 Blender reviewed_seam_pairs 对照；静态/动态裂缝分别验收"
+    },
+    "rig_stretch_live": {
+      "status": "PENDING",
+      "evidence": "",
+      "notes": "以原模型比例为参照，确认行走、射击、换弹、蹲跳、受击、死亡转场中四肢无拉长；截图仅为证据线索"
+    }
+  }
+}

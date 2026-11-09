@@ -1,0 +1,60 @@
+{
+  "target": "prop_preview",
+  "addon_name": "my_model_addon",
+  "cs2_root": "C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive",
+  "blender_executable": "C:/Program Files/Blender Foundation/Blender 4.5/blender.exe",
+  "blend_file": "D:/my_models/character.blend",
+  "ag2_profile": "ag2_profile.example.json",
+  "bbox_rules": "bbox_rules.example.json",
+  "deploy_files": [
+    {
+      "source": "D:/my_models/character.vmdl",
+      "area": "content",
+      "relative_path": "models/custom/character.vmdl"
+    },
+    {
+      "source": "D:/my_models/character.fbx",
+      "area": "content",
+      "relative_path": "models/custom/character.fbx"
+    }
+  ],
+  "compile_sources": [
+    "models/custom/character.vmdl"
+  ],
+  "required_compiled_files": [
+    "models/custom/character.vmdl_c"
+  ],
+  "launch_mode": "tools",
+  "server_executable": "",
+  "server_map": "de_dust2",
+  "server_port": 27015,
+  "notes": "这是路径示例，不能直接运行。先在 Workshop Tools 创建同名 Addon、用 ModelDoc 创建有效的 .vmdl，并填入你本机真实路径。",
+  "auto_export_fbx": {
+    "enabled": true,
+    "relative_path": "models/custom/character.fbx",
+    "modeldoc_fbx_reference_verified": false,
+    "notes": "在 ModelDoc 中确认 .vmdl 使用了这条相对 FBX 路径后才设为 true，自动修复后此 FBX 会替换 deploy_files 对应源文件。"
+  },
+  "game_test_config": "game_test.local.json",
+  "proportion_profile": "proportions.local.json",
+  "original_proportions": "original_proportions.local.json",
+  "animation_suite": "animation_suite.example.json",
+  "viewmodel_blend_file": "",
+  "viewmodel_ag2_profile": "",
+  "viewmodel_bbox_rules": "",
+  "viewmodel_proportion_profile": "",
+  "viewmodel_original_proportions": "",
+  "accessories": "accessories.local.json",
+  "joint_deformation": "joint_deformation.local.json",
+  "viewmodel_accessories": "",
+  "viewmodel_joint_deformation": "",
+  "mesh_integrity": "mesh_integrity.local.json",
+  "rig_stretch": "rig_stretch.local.json",
+  "viewmodel_mesh_integrity": "",
+  "viewmodel_rig_stretch": "",
+  "seam_repair": "seam_repair.local.json",
+  "workflow_guidance": "v7: 先全身源模型修复/比例审计，再 --extract-viewmodel 单独生成副本，手工重定向 FP 骨架与动作，然后分别审计世界模型/手模，核对模型部署清单。",
+  "firstperson_extraction": "viewmodel_extraction.local.json",
+  "dual_viewmodel": "dual_viewmodel.local.json",
+  "firstperson_source_blend_file": "D:/my_models/fullbody_extraction_source.blend"
+}

@@ -1,0 +1,62 @@
+{
+  "target": "player_runtime",
+  "addon_name": "custom_agent_model",
+  "cs2_root": "C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive",
+  "blender_executable": "C:/Program Files/Blender Foundation/Blender 4.5/blender.exe",
+  "blend_file": "D:/models/world_final.blend",
+  "ag2_profile": "ag2_profile.local.json",
+  "bbox_rules": "bbox_rules.local.json",
+  "proportion_profile": "proportions.local.json",
+  "original_proportions": "original_proportions.local.json",
+  "animation_suite": "animation_suite.local.json",
+  "accessories": "accessories.local.json",
+  "joint_deformation": "joint_deformation.local.json",
+  "mesh_integrity": "mesh_integrity.local.json",
+  "rig_stretch": "rig_stretch.local.json",
+  "firstperson_extraction": "viewmodel_extraction.local.json",
+  "dual_viewmodel": "dual_viewmodel.local.json",
+  "viewmodel_blend_file": "D:/models/fp_final_rigged.blend",
+  "viewmodel_ag2_profile": "viewmodel_ag2_profile.local.json",
+  "viewmodel_bbox_rules": "viewmodel_bbox_rules.local.json",
+  "viewmodel_proportion_profile": "viewmodel_proportion_profile.local.json",
+  "viewmodel_original_proportions": "fp_original_proportions.local.json",
+  "viewmodel_accessories": "viewmodel_accessories.local.json",
+  "viewmodel_joint_deformation": "viewmodel_joint_deformation.local.json",
+  "viewmodel_mesh_integrity": "viewmodel_mesh_integrity.local.json",
+  "viewmodel_rig_stretch": "viewmodel_rig_stretch.local.json",
+  "seam_repair": "seam_repair.local.json",
+  "deploy_files": [
+    {
+      "source": "D:/models/export/world_final.fbx",
+      "area": "content",
+      "relative_path": "models/custom/character_world.fbx"
+    },
+    {
+      "source": "D:/models/export/fp_final.fbx",
+      "area": "content",
+      "relative_path": "models/custom/character_firstperson.fbx"
+    },
+    {
+      "source": "D:/models/modeldoc/character.vmdl",
+      "area": "content",
+      "relative_path": "models/custom/character.vmdl"
+    }
+  ],
+  "compile_sources": [
+    "models/custom/character.vmdl"
+  ],
+  "required_compiled_files": [
+    "models/custom/character.vmdl_c"
+  ],
+  "auto_export_fbx": {
+    "enabled": false,
+    "relative_path": "models/custom/character_world.fbx",
+    "modeldoc_fbx_reference_verified": false
+  },
+  "launch_mode": "dedicated_server",
+  "server_map": "de_dust2",
+  "server_port": 27015,
+  "game_test_config": "game_test.local.json",
+  "notes": "全部为模板路径，不能直接运行。独立第一人称手模已人工绑定到 viewmodel rig 后才填写 viewmodel_blend_file；FBX 单独导出，ModelDoc 共享 bodygroup 或 separate_vmdl 任选其一。",
+  "firstperson_source_blend_file": "D:/models/fullbody_extraction_source.blend"
+}

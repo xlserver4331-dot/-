@@ -1,0 +1,381 @@
+{
+  "skill": "cs2-model-rigging-deployment",
+  "version": "7.0.0",
+  "files": [
+    {
+      "path": "CHANGELOG-v6.md",
+      "bytes": 1593,
+      "sha256": "69ee63cedb2c7b481d8f09c696787c85559254a1feacf7f26869ab8f098fa45d"
+    },
+    {
+      "path": "CHANGELOG-v7.md",
+      "bytes": 1389,
+      "sha256": "cb8c2d6b9d79e5ecffcf8a58146f263abadfec403ee33a3a1512871545098d32"
+    },
+    {
+      "path": "README.md",
+      "bytes": 8607,
+      "sha256": "2537ee3a149e06947ca8a59efe0aeb997ca1082603572ad915677246eb0c1d70"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 12293,
+      "sha256": "7061237987b9d03cd9f3b81fbf1e3676ca5b612bf46a2cf1a1c1c02463c5e200"
+    },
+    {
+      "path": "config/accessories.example.json",
+      "bytes": 1993,
+      "sha256": "edc9f291a51437f3ab21d80dbeed204022d98262a42566489e2f114737a2cc96"
+    },
+    {
+      "path": "config/ag2_profile.example.json",
+      "bytes": 1403,
+      "sha256": "13ba99290b7283a750374e6a4a0475541d51da71b84bd322060a514201a453e3"
+    },
+    {
+      "path": "config/animation_suite.example.json",
+      "bytes": 1927,
+      "sha256": "11e2f22b92f7cc6b9eba05d87625eb6a45040396b46daab9176b9bd9e6a0b1e9"
+    },
+    {
+      "path": "config/auto_workflow.example.json",
+      "bytes": 2563,
+      "sha256": "6f8b3d01b330d519ba6c3c73dfea89dea608c67abe76995d7a5060edd00a50de"
+    },
+    {
+      "path": "config/bbox_rules.example.json",
+      "bytes": 483,
+      "sha256": "659301f0c111d761bd71b7d084f53a711208249e793046d9810b69dfab2f8fd5"
+    },
+    {
+      "path": "config/dual_viewmodel.example.json",
+      "bytes": 1817,
+      "sha256": "5ad827dc42be13f0eb0f0606dc420db100f0ead5297f7cee54a2997c6e38dd14"
+    },
+    {
+      "path": "config/firstperson_bone_map.example.json",
+      "bytes": 742,
+      "sha256": "5ccf019647ffe021dc417c3bb3fb66a6be1708e5918ffc888d263cca3a708b71"
+    },
+    {
+      "path": "config/game_test.example.json",
+      "bytes": 3370,
+      "sha256": "5173f0553369e3f389bf35dca8fcbb08626fc5fde7282e434c0d5cd44cd7948d"
+    },
+    {
+      "path": "config/joint_deformation.example.json",
+      "bytes": 1757,
+      "sha256": "0e3f0c6be261c8343df5addf7c0f3b21f2461a909e5aa7e6098aedcc51518858"
+    },
+    {
+      "path": "config/mesh_integrity.example.json",
+      "bytes": 740,
+      "sha256": "8fc706fa7ed5479d4679b0efa8ffc8416d52401d7b82d3d5742d8e52911606c7"
+    },
+    {
+      "path": "config/proportions.example.json",
+      "bytes": 1726,
+      "sha256": "eb56cfc99ccd84061d1e07f6b9673c147e8671d58ed3e1226e4e378684f921c4"
+    },
+    {
+      "path": "config/retarget_map.example.json",
+      "bytes": 1259,
+      "sha256": "7bc953898e3c9c87b443440257bbe11805841cc2d202611b007a41172887248d"
+    },
+    {
+      "path": "config/rig_stretch.example.json",
+      "bytes": 421,
+      "sha256": "3fbb1aea7fdac11500d297a3a707efdefc500e47c058c3a11e9bf11ed7a130a2"
+    },
+    {
+      "path": "config/seam_repair.example.json",
+      "bytes": 511,
+      "sha256": "e568cc183daa322aa92b6f0a9f8fab0cba227ddd4359afafd3dd4b11f9662164"
+    },
+    {
+      "path": "config/viewmodel_extraction.example.json",
+      "bytes": 1096,
+      "sha256": "cef35e2985fd7cf66bee9f936b84e8c62baa75569c0c83f244b3c4a39db1c649"
+    },
+    {
+      "path": "config/visual_baseline.example.json",
+      "bytes": 360,
+      "sha256": "afc71581495a52aab297cca41a24ef8beee86ee420aa4d65e927268e30dea475"
+    },
+    {
+      "path": "config/workflow.player_dual.example.json",
+      "bytes": 2703,
+      "sha256": "4a0a3ae6d5a9c20665e89ac22b9bf9609277611d85afafa3c3beda6d1dd26be2"
+    },
+    {
+      "path": "references/automation-and-launch.md",
+      "bytes": 11168,
+      "sha256": "3c38aaa2074ad87d4fab4b05e911b67fa7c38212219cc47f06f9243b8bf30417"
+    },
+    {
+      "path": "references/bounding-boxes.md",
+      "bytes": 4570,
+      "sha256": "d5944bb5bfe5d902343a0c903751a5a482f3e3f563e18de36a1d9ce2999d55c4"
+    },
+    {
+      "path": "references/game-self-test.md",
+      "bytes": 12388,
+      "sha256": "65ae7ed9938881200478fddf41893756caba1d097c505f8c0294b85391cb54a5"
+    },
+    {
+      "path": "references/modeldoc-deployment.md",
+      "bytes": 6846,
+      "sha256": "fa316db5171447eaf45aabe1b96ec04108c67dbd5971a3de4bffbd1028d4d3a0"
+    },
+    {
+      "path": "references/rigging-and-driving.md",
+      "bytes": 6194,
+      "sha256": "a9c952235d9286b4a729e28438f1eeec2b3ec5219a7c9d12d86288936de22837"
+    },
+    {
+      "path": "references/sources.md",
+      "bytes": 5669,
+      "sha256": "d4e0b00a88f905571b9fe677db4b1b426ed28e315dc4e201c5e59d14ec015188"
+    },
+    {
+      "path": "references/v4-proportions-animation-death.md",
+      "bytes": 11218,
+      "sha256": "4ab4eb9537eeb2ac527cbc30cfdc8112b50f54076eab713fc3dccd5ffad3990a"
+    },
+    {
+      "path": "references/v5-accessories-joint-deformation.md",
+      "bytes": 14213,
+      "sha256": "cd1adeb81dea21a11a8358d4cfd08537bb31278f60db8449ac3a61129be4c2ef"
+    },
+    {
+      "path": "references/v6-stretch-crack-recovery.md",
+      "bytes": 17429,
+      "sha256": "3177b977528aa5738d3587e8955634942b2ed46eac87ebc0279a837e269b737f"
+    },
+    {
+      "path": "references/v7-dual-viewmodel-extraction.md",
+      "bytes": 16174,
+      "sha256": "0e0eeac5acb8ee917b3e656eb678eb694be1af71f22d4b7a651f04cb125313ec"
+    },
+    {
+      "path": "requirements-game.txt",
+      "bytes": 198,
+      "sha256": "851e2524f33bfc8c3a7621a0a210db82fcc971eb622c2f56e75c62361fdc3b57"
+    },
+    {
+      "path": "run_skill.ps1",
+      "bytes": 1131,
+      "sha256": "f6e039bbf23597774832238375f2d23f6219d2ed9439d4b2e78764b025b51633"
+    },
+    {
+      "path": "scripts/accessory_core.py",
+      "bytes": 3525,
+      "sha256": "272e9925db16f1a91515a2648e5d3bb363f42170e6c177370cd33c994eeab0cb"
+    },
+    {
+      "path": "scripts/animation_suite.py",
+      "bytes": 2584,
+      "sha256": "dff5f1da6d7f8a37e35a11fc600adfec59e4e783c69dec7fc72618c952629257"
+    },
+    {
+      "path": "scripts/auto_workflow.py",
+      "bytes": 32961,
+      "sha256": "3452e8544bc6b979a1434cac7de31ed9b155c511876834361c3a7ced213f3837"
+    },
+    {
+      "path": "scripts/auto_workflow_core.py",
+      "bytes": 9431,
+      "sha256": "8c405060ec84cb88dad12b12491ba4eb286a427fa6cd94cdb9d5b05545be466c"
+    },
+    {
+      "path": "scripts/bbox_math.py",
+      "bytes": 1891,
+      "sha256": "1ed33c01e32ed20fe2bf43e1ca119a0366e2b0073b3b4b9006d926395279bd70"
+    },
+    {
+      "path": "scripts/blender_accessory_audit.py",
+      "bytes": 9871,
+      "sha256": "4fb959e7c807a0bdc8d8d35783d55468bcdebe27df31608d15da15881da319f9"
+    },
+    {
+      "path": "scripts/blender_accessory_setup.py",
+      "bytes": 7543,
+      "sha256": "8b3d98e222c57cca8216f4f69424b7b2725f376665c1d579e6c843025ad1419b"
+    },
+    {
+      "path": "scripts/blender_audit.py",
+      "bytes": 21061,
+      "sha256": "710ea8dd3356990b993f1b6858e275b8a0c098339a1e72f078c6a2c82f944326"
+    },
+    {
+      "path": "scripts/blender_auto_fix.py",
+      "bytes": 6198,
+      "sha256": "1dcf4312f2f27cc80edc458533876ab61921280d0b4becfafc01e87d1c7871f6"
+    },
+    {
+      "path": "scripts/blender_extract_firstperson.py",
+      "bytes": 8667,
+      "sha256": "ff29a6836465f916fc256668503f2db818f017d31fbc79a821ac981e99cd2551"
+    },
+    {
+      "path": "scripts/blender_joint_deformation.py",
+      "bytes": 9836,
+      "sha256": "adca90eee4d6aa8bcab04d0e9ab8955fcc16c89b014b7e363d599f3729137e86"
+    },
+    {
+      "path": "scripts/blender_mesh_gap_audit.py",
+      "bytes": 10387,
+      "sha256": "5982edb45f2da39e337ee58a5c3a46c753fff58d261fd86b3aebda1255db58cf"
+    },
+    {
+      "path": "scripts/blender_proportion_audit.py",
+      "bytes": 8611,
+      "sha256": "5f38298c24bfdfa60bc9b47c1c219d98c598771606980f9454a8a00709af1b8d"
+    },
+    {
+      "path": "scripts/blender_retarget_setup.py",
+      "bytes": 3608,
+      "sha256": "569eff4172b45fb9625344fee95f515dd522a75ad4feeec9fc22177891470385"
+    },
+    {
+      "path": "scripts/blender_rig_stretch_audit.py",
+      "bytes": 6062,
+      "sha256": "9c8c98e84b2d6bce0fba6a147e848bc385c7d4f1476a893fa8f5399be0c8686f"
+    },
+    {
+      "path": "scripts/blender_seam_repair.py",
+      "bytes": 7314,
+      "sha256": "609f6a55f592de5d78d4584d896a0e1e81c71ddba59bf4313b44c6fa510c5a3a"
+    },
+    {
+      "path": "scripts/blender_viewmodel_final_audit.py",
+      "bytes": 7071,
+      "sha256": "9b8e223644dfeb238f5d70af6ec32f9b1bc4a2b0818b5deebed707d7c5e8a412"
+    },
+    {
+      "path": "scripts/deformation_metrics.py",
+      "bytes": 2537,
+      "sha256": "e150793183532922e03ecf3fa7a6ba248cc86bac69413b044a75736f6f18c323"
+    },
+    {
+      "path": "scripts/dual_viewmodel_gate.py",
+      "bytes": 4005,
+      "sha256": "30d9f7180cb5924a6cf82774497c6a760b187ba7bcb6313e1490ddcee657e50a"
+    },
+    {
+      "path": "scripts/finalize_report.py",
+      "bytes": 5009,
+      "sha256": "87d90061b0733f90e54609e33fe3b401800dd81947a5d055bf2510131726e493"
+    },
+    {
+      "path": "scripts/game_evidence_audit.py",
+      "bytes": 5865,
+      "sha256": "332c664e29dbff6d839a14f767f97be0d2706ef228781b6af1168fff86853eaa"
+    },
+    {
+      "path": "scripts/game_evidence_merge.py",
+      "bytes": 4706,
+      "sha256": "24a0713b7f4da58513d658d858503bbe7cba01eec73ebee6e009fa4b281b44e7"
+    },
+    {
+      "path": "scripts/game_qa.py",
+      "bytes": 19530,
+      "sha256": "be804196162ce578f904fc33d66c78e76d32e4ba5191a59dd42eae74f68bab5a"
+    },
+    {
+      "path": "scripts/game_qa_core.py",
+      "bytes": 10431,
+      "sha256": "f7e5cc9b019dda4a236c753fd35a66fb8386e3dac8a692055b657012d687d517"
+    },
+    {
+      "path": "scripts/issue_triage.py",
+      "bytes": 3015,
+      "sha256": "f782c6dce319969646187c29711bbe7ca2a141de56d0b68dbcd731cf6573e1a1"
+    },
+    {
+      "path": "scripts/mesh_gap_math.py",
+      "bytes": 1345,
+      "sha256": "be2f5b5551013cca2c9c512330c7c7b255a57ef3982e900b0447745f09e15a66"
+    },
+    {
+      "path": "scripts/modeldoc_reference_audit.py",
+      "bytes": 1902,
+      "sha256": "8a754fa31a5e3124efcae460e26717891e1b552a6279788d71afd60043a43e7a"
+    },
+    {
+      "path": "scripts/pin_viewmodel_export.py",
+      "bytes": 2222,
+      "sha256": "82f92216406413e46a257dbcb8e6cd8386fee5cea5d832db93bd4315ffbf2516"
+    },
+    {
+      "path": "scripts/proportion_math.py",
+      "bytes": 2693,
+      "sha256": "545784afddf2cf7a29e7c5e76177934ffa7bf00d1320627acaed57f8e145aba3"
+    },
+    {
+      "path": "scripts/validate_skill.py",
+      "bytes": 3248,
+      "sha256": "ebbb91e2c39e50e5af72c6ed07041b8463f0373c21fe87282092555b2b29a3aa"
+    },
+    {
+      "path": "scripts/viewmodel_core.py",
+      "bytes": 3615,
+      "sha256": "9b548b93a481c5850f83618b97af0f904101665388f08cd5d1f78da72e1f771c"
+    },
+    {
+      "path": "templates/engine_validation.template.json",
+      "bytes": 4484,
+      "sha256": "ce6eaf11b14a6d4961786c94489279ad7ecd63e34abd5e0d741cf77f2a20659b"
+    },
+    {
+      "path": "tests/test_auto_workflow.py",
+      "bytes": 5826,
+      "sha256": "131c496059f86e96c5f8aef082af7c9402755352ffcd15461d46c3663219e00f"
+    },
+    {
+      "path": "tests/test_bbox_math.py",
+      "bytes": 1064,
+      "sha256": "3ec8cf7a358a27ff6d3ab7c9ee97ddf484fc1f94c028f91c7e1a909eb748fe23"
+    },
+    {
+      "path": "tests/test_finalize_report.py",
+      "bytes": 2454,
+      "sha256": "de9e334a5a82b25ddfa3ec3efc4992888cd72b95d5dd089215eea06453b434df"
+    },
+    {
+      "path": "tests/test_game_qa.py",
+      "bytes": 9824,
+      "sha256": "1eb87c5ea48c2a360704896170179377f53703c3230b97b7d1e0acd6eef884f4"
+    },
+    {
+      "path": "tests/test_orchestration_simulated.py",
+      "bytes": 11882,
+      "sha256": "8b608958795494b76a248b33df5691910550e090172505e1f58491c86cad9b00"
+    },
+    {
+      "path": "tests/test_v4_animation_proportions.py",
+      "bytes": 5344,
+      "sha256": "703a84c1241064c7cd775ca0df06a6f5b9052edd3652fff1787e11c26807e1a3"
+    },
+    {
+      "path": "tests/test_v5_accessory_joint.py",
+      "bytes": 5886,
+      "sha256": "100ecfb2765f78de411f17256ccc3e1238c9255d4d25171a95fc22807259046f"
+    },
+    {
+      "path": "tests/test_v6_stretch_crack.py",
+      "bytes": 3047,
+      "sha256": "5dad6f7adba2345fcfd09716667a8c24b57f314b6c333f3f2ad769940c4c5955"
+    },
+    {
+      "path": "tests/test_v7_firstperson.py",
+      "bytes": 5186,
+      "sha256": "30367042c1e9c5eee584402c30a839223040c6351b9206105dc0bf9b93cf3e50"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 86,
+      "sha256": "43cc897ea293baefbb0263fc92f1ba9488ebc5552c195cfd2656133a8d457baf"
+    }
+  ]
+}

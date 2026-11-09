@@ -1,0 +1,87 @@
+{
+  "target_armature": "CS2_Rig",
+  "no_accessories_confirmed": false,
+  "min_deform_weight": 0.001,
+  "accessories": [
+    {
+      "id": "left_hair_strand",
+      "mesh_objects": [
+        "Hair_Strand_L"
+      ],
+      "anchor_bone": "head_0",
+      "mode": "secondary_baked",
+      "rest_positions_approved": false,
+      "weight_mode": "manual",
+      "driver_strategy": "baked_action_or_confirmed_source2_constraint",
+      "bones": [
+        {
+          "name": "acc_hair_L_01",
+          "head": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "tail": [
+            0.0,
+            -0.1,
+            0.95
+          ]
+        },
+        {
+          "name": "acc_hair_L_02",
+          "head": [
+            0.0,
+            -0.1,
+            0.95
+          ],
+          "tail": [
+            0.0,
+            -0.2,
+            0.85
+          ]
+        },
+        {
+          "name": "acc_hair_L_03",
+          "head": [
+            0.0,
+            -0.2,
+            0.85
+          ],
+          "tail": [
+            0.0,
+            -0.3,
+            0.75
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chest_keychain",
+      "mesh_objects": [
+        "Keychain"
+      ],
+      "anchor_bone": "spine_3",
+      "mode": "rigid",
+      "rest_positions_approved": false,
+      "weight_mode": "manual",
+      "driver_strategy": "parent_follow",
+      "bones": [
+        {
+          "name": "acc_keychain_root",
+          "head": [
+            0.0,
+            0.2,
+            0.6
+          ],
+          "tail": [
+            0.0,
+            0.2,
+            0.5
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": "示例中坐标是占位符，千万不要在未根据原模型标定时设置 rest_positions_approved=true。若确无装饰物，改为 accessories=[] 和 no_accessories_confirmed=true。柔性配件必须人工调整权重与动态驱动，不会假定 CS2 支持某种 Blender 物理约束。",
+  "min_covered_vertex_fraction": 0.7
+}

@@ -1,0 +1,22 @@
+{
+  "description": "Original model is the immutable truth. Calibrate bone-name pairs for the actual source and retargeted rigs. Do not stretch to default CS2 agent limbs.",
+  "source_armature": "OriginalRig",
+  "target_armature": "CS2_Rig",
+  "max_relative_deviation": 0.03,
+  "max_pose_stretch": 0.015,
+  "max_nonuniform_scale": 0.005,
+  "sample_step_frames": 3,
+  "source_blend_sha256_check": false,
+  "measurements": [
+    {"id": "torso_lower", "anchor": true, "source": ["mixamorig:Hips", "mixamorig:Spine2"], "target": ["pelvis", "spine_3"]},
+    {"id": "l_upper_arm", "source": ["mixamorig:LeftArm", "mixamorig:LeftForeArm"], "target": ["arm_upper_L", "arm_lower_L"]},
+    {"id": "l_forearm", "source": ["mixamorig:LeftForeArm", "mixamorig:LeftHand"], "target": ["arm_lower_L", "hand_L"]},
+    {"id": "r_upper_arm", "source": ["mixamorig:RightArm", "mixamorig:RightForeArm"], "target": ["arm_upper_R", "arm_lower_R"]},
+    {"id": "r_forearm", "source": ["mixamorig:RightForeArm", "mixamorig:RightHand"], "target": ["arm_lower_R", "hand_R"]},
+    {"id": "l_thigh", "source": ["mixamorig:LeftUpLeg", "mixamorig:LeftLeg"], "target": ["leg_upper_L", "leg_lower_L"]},
+    {"id": "l_shin", "source": ["mixamorig:LeftLeg", "mixamorig:LeftFoot"], "target": ["leg_lower_L", "ankle_L"]},
+    {"id": "r_thigh", "source": ["mixamorig:RightUpLeg", "mixamorig:RightLeg"], "target": ["leg_upper_R", "leg_lower_R"]},
+    {"id": "r_shin", "source": ["mixamorig:RightLeg", "mixamorig:RightFoot"], "target": ["leg_lower_R", "ankle_R"]}
+  ],
+  "notes": "These are example bone names ONLY. Always adapt to actual original and target. Add more independent torso anchors if possible. First-person arms need a separate baseline and profile."
+}
