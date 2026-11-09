@@ -1,5 +1,0 @@
-# Only required for authorized Windows GUI automation + screenshots.
-# Install separately; core Blender/Addon workflow remains stdlib-only.
-pyautogui>=0.9.54,<1
-Pillow>=10,<13
-opencv-python>=4.8,<5

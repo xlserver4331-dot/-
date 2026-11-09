@@ -1,8 +1,0 @@
-{
-  "monitored_bones": ["arm_upper_L", "arm_lower_L", "arm_upper_R", "arm_lower_R", "leg_upper_L", "leg_lower_L", "leg_upper_R", "leg_lower_R"],
-  "max_pose_bone_length_change": 0.015,
-  "max_nonuniform_object_scale": 0.005,
-  "sample_step_frames": 2,
-  "max_frames_per_action": 80,
-  "notes": "仅示例。监控名称必须与当前模型骨架一致，且原始模型四肢比例仍需 source_proportions 基准。"
-}
